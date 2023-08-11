@@ -1,0 +1,9 @@
+---
+
+- name: Ensure Debian sources updated.
+  ansible.builtin.template:
+    src: templates/debian-sources.list.j2
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: '0644'

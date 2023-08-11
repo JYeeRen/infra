@@ -1,0 +1,21 @@
+---
+
+- name: Check if cargo is installed.
+  ansible.builtin.shell: command -v cargo # noqa command-instead-of-shell
+  register: cargo_exists
+  changed_when: false
+  ignore_errors: true
+
+- name: Download Rust Installer.
+  ansible.builtin.get_url:
+    url: https://sh.rustup.rs
+    dest: /tmp/sh.rustup.rs
+    mode: "0755"
+    force: true
+  when: cargo_exists is failed
+
+- name: Install cargo and rust.
+  when: cargo_exists is failed
+  ansible.builtin.command: /tmp/sh.rustup.rs -y --profile {{ rust_install_profile }}
+  register: rustup_result
+  changed_when: true

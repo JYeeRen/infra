@@ -1,0 +1,4 @@
+---
+
+vgpu_unlock: false
+cpu: "{{ 'intel' if ('Intel' in ansible_processor[1]) else 'amd' }}"

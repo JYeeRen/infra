@@ -1,0 +1,8 @@
+---
+
+- name: Ensure vgpu-proxmox repo exists.
+  ansible.builtin.git:
+    repo: https://gitlab.com/polloloco/vgpu-proxmox.git
+    dest: /root/vgpu-proxmox
+    version: master
+    accept_hostkey: false

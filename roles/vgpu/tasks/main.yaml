@@ -1,0 +1,51 @@
+---
+
+- name: Ensure packages installed.
+  ansible.builtin.apt:
+    name: "{{ item.name | default(item) }}"
+    install_options: "{{ item.install_options | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items:
+    - git
+    - build-essential
+    - dkms
+    - pve-headers
+    - mdevctl
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure vgpu_unlock installed.
+  ansible.builtin.include_tasks: vgpu_unlock.yaml
+
+- name: Enable IOMMU in kernel(GRUB).
+  include_tasks: iommu-grub.yaml
+
+- name: Enable IOMMU in kernel(systemd-boot).
+  include_tasks: iommu-systemd-boot.yaml
+
+- name: Ensure kernel modules loaded.
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    regexp: "^{{ item }}$"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - vfio
+    - vfio_iommu_type1
+    - vfio_pci
+    - vfio_virqfd
+
+- name: Ensure blacklist.conf exists.
+  ansible.builtin.file:
+    path: /etc/modprobe.d/blacklist.conf
+    mode: '0644'
+    state: touch
+
+- name: Ensure nouveau driver in blacklist.
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: '^blacklist nouveau'
+    line: blacklist nouveau
+    state: present
+  notify:
+    # - Update initramfs
+    - Reboot

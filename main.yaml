@@ -1,0 +1,11 @@
+---
+
+- name: Setup pve
+  hosts: pve
+  vars:
+    pve: true
+    use_official_security: false
+  roles:
+    - role: sys-mirror-acceleration
+    - role: pve-remove-nag
+    - role: vgpu

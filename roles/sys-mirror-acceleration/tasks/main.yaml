@@ -1,0 +1,20 @@
+---
+
+- name: Ensure Debian sources replaced.
+  include_tasks: debian.yaml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure CT Template sources replaced.
+  include_tasks: pve-ct-template.yaml
+  # when: ansible_distribution == "Proxmox Virtual Environment"
+  when: pve
+
+- name: Ensure pve no subscription present.
+  include_tasks: pve-no-subscription.yaml
+  # when: ansible_distribution == "Proxmox Virtual Environment"
+  when: pve
+
+- name: Ensure pve ceph no subscription present.
+  include_tasks: pve-ceph.yaml
+  # when: ansible_distribution == "Proxmox Virtual Environment"
+  when: pve

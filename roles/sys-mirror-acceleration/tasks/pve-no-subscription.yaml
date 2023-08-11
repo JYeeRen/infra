@@ -1,0 +1,14 @@
+---
+
+- name: Ensure enterprise repo not present.
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pve-enterprise.list
+    state: absent
+
+- name: Ensure Debian sources present.
+  ansible.builtin.template:
+    src: templates/pve-no-subscription.list.j2
+    dest: /etc/apt/sources.list.d/pve-no-subscription.list
+    owner: root
+    group: root
+    mode: '0644'

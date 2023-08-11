@@ -1,0 +1,60 @@
+---
+
+- name: Ensure vgpu_unlock-rs repo exists.
+  ansible.builtin.git:
+    repo: https://github.com/mbilker/vgpu_unlock-rs.git
+    dest: /opt/vgpu_unlock-rs
+    version: master
+    accept_hostkey: false
+
+- name: Ensure cargo installed.
+  ansible.builtin.include_role:
+    name: env-rust
+
+- name: Build vgpu_unlock-rs.
+  ansible.builtin.command: cargo build --release
+  args:
+    chdir: /opt/vgpu_unlock-rs
+    creates: /opt/vgpu_unlock-rs/target/release
+
+- name: Ensure vgpu_unlock related dir existed.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - /etc/vgpu_unlock
+    - /etc/systemd/system/nvidia-vgpud.service.d
+    - /etc/systemd/system/nvidia-vgpu-mgr.service.d
+
+- name: Ensure vgpu_unlock config present.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0644'
+    state: touch
+  with_items:
+    - /etc/vgpu_unlock/profile_override.toml
+    - /etc/vgpu_unlock/config.toml
+
+- name: Ensure vgpu_unlock disabled.
+  ansible.builtin.lineinfile:
+    path: /etc/vgpu_unlock/config.toml
+    regexp: '^unlock ='
+    line: 'unlock = {{ "true" if (vgpu_unlock) else "false" }}'
+    state: present
+
+- name: Ensure nvidia-vgpud.service.d/vgpu_unlock.conf exists.
+  ansible.builtin.template:
+    src: templates/vgpu_unlock.conf.j2
+    dest: /etc/systemd/system/nvidia-vgpud.service.d/vgpu_unlock.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure nvidia-vgpu-mgr.service.d/vgpu_unlock.conf exists.
+  ansible.builtin.template:
+    src: templates/vgpu_unlock.conf.j2
+    dest: /etc/systemd/system/nvidia-vgpu-mgr.service.d/vgpu_unlock.conf
+    owner: root
+    group: root
+    mode: '0644'

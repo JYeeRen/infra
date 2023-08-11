@@ -1,0 +1,5 @@
+---
+
+use_official_security: true
+mirror: https://mirrors.aliyun.com
+pve_mirror: https://mirrors.tuna.tsinghua.edu.cn

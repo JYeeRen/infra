@@ -1,0 +1,13 @@
+---
+
+- name: Enuse Ceph enterprise replaced.
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/ceph.list
+    regexp: https://enterprise.proxmox.com
+    replace: http://download.proxmox.com
+
+- name: Enuse Ceph enterprise replaced.
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/ceph.list
+    regexp: enterprise$
+    replace: no-subscription

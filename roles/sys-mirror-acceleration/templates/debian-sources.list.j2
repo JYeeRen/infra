@@ -1,0 +1,20 @@
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb {{ mirror }}/debian/ {{ ansible_distribution_release }} main contrib non-free non-free-firmware
+# deb-src {{ mirror }}/debian/ {{ ansible_distribution_release }} main contrib non-free non-free-firmware
+
+deb {{ mirror }}/debian/ {{ ansible_distribution_release }}-updates main contrib non-free non-free-firmware
+# deb-src {{ mirror }}/debian/ {{ ansible_distribution_release }}-updates main contrib non-free non-free-firmware
+
+deb {{ mirror }}/debian/ {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware
+# deb-src {{ mirror }}/debian/ {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware
+
+# deb {{ mirror }}/debian-security {{ ansible_distribution_release }}-security main contrib non-free non-free-firmware
+# # deb-src {{ mirror }}/debian-security {{ ansible_distribution_release }}-security main contrib non-free non-free-firmware
+
+{% if use_official_security %}
+deb https://security.debian.org/debian-security {{ansible_distribution_release}}-security main contrib non-free non-free-firmware
+# deb-src https://security.debian.org/debian-security {{ansible_distribution_release}}-security main contrib non-free non-free-firmware
+{% else %}
+deb {{ mirror }}/debian-security {{ansible_distribution_release}}-security main contrib non-free non-free-firmware
+# deb-src https://security.debian.org/debian-security {{ansible_distribution_release}}-security main contrib non-free non-free-firmware
+{% endif %}

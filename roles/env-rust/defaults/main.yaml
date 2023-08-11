@@ -1,0 +1,6 @@
+---
+
+# minimal  rustc, rust-std, cargo
+# default  adds rust-docs, rustfmt, clippy
+# complete includes all the components available through rustup
+rust_install_profile: minimal
