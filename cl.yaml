@@ -3,26 +3,11 @@ version: 1.0.0
 passwd:
   users:
     - name: core
+      password_hash: $6$rounds=4096$8QyuDNZTH4avrOSF$WiWRh7GNfmIor6m3JSD7xpr3yQD38b0pRHoWaWdKTuAW/nUo1ws3Q8wOGEjbCfNlGGqpu6WYAtybYlLyv5ZJA1
       ssh_authorized_keys:
-        - |
-          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9PURxQWwzj7coP+ex7/K061GL7ta1
-          ++IikhC5oazBzQPXH5oFha0g+rIqP3lVSC2Ajxq+zTCkfB8zy7PxmIYR7fruRNt7RiU8
-          fuGjcArURhRxC4wOslB9kcYDgIp3QvbuJBZNh6ekXwvxFEkgHqZ5omD2c10dPWxNY908
-          H0k+ENXpuWOQ46ZU+t16mz1G65VY+uvzN67b6LOjRUe+b19wNFAXPgvlqnVxzXHxerqK
-          Bq8Ok4JCGYNetUucfPeRh9DC/WrzYFfIbMBuoGz0VyZ7dBAYbzeNDvUUozcAn4WXjtyA
-          +S83ClLtH3C5E2WspnP74dpDH80+Ls7yXQAkukdFwWpIzUNiZEZhyeAZPY18kKMtmpbD
-          M0sjrBS/OMJXu8UEODD+KZx7oVTRwOVVXqb5hfytnLTts/cO/Ic5xPfKpRtspJqg8hR1
-          Sisv792sWUDOebuWbMt4R0gtTfJaE84IEI1vYANbQtMHWB/nZkE9nQIOMXuiBQnyo/zG
-          snIE7DvlQXPqfNiR7WUfyTPUGUN7qYmfeXagiJl9xLw8TbNtoRMjDX2rqbNbQlG569v2
-          cdM3YlP+fwsd1t8IzG/euss0HIV2ZEiKcvQJxc6rap+Nqvfl/6mhO5GYgMLPhNjXyTN7
-          TOrMLdTuqsIfv7/1wCCKnfcKA9UPFsFHxcLcmk1H0Q== chieh736@selfhost
-
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9PURxQWwzj7coP+ex7/K061GL7ta1++IikhC5oazBzQPXH5oFha0g+rIqP3lVSC2Ajxq+zTCkfB8zy7PxmIYR7fruRNt7RiU8fuGjcArURhRxC4wOslB9kcYDgIp3QvbuJBZNh6ekXwvxFEkgHqZ5omD2c10dPWxNY908H0k+ENXpuWOQ46ZU+t16mz1G65VY+uvzN67b6LOjRUe+b19wNFAXPgvlqnVxzXHxerqKBq8Ok4JCGYNetUucfPeRh9DC/WrzYFfIbMBuoGz0VyZ7dBAYbzeNDvUUozcAn4WXjtyA+S83ClLtH3C5E2WspnP74dpDH80+Ls7yXQAkukdFwWpIzUNiZEZhyeAZPY18kKMtmpbDM0sjrBS/OMJXu8UEODD+KZx7oVTRwOVVXqb5hfytnLTts/cO/Ic5xPfKpRtspJqg8hR1Sisv792sWUDOebuWbMt4R0gtTfJaE84IEI1vYANbQtMHWB/nZkE9nQIOMXuiBQnyo/zGsnIE7DvlQXPqfNiR7WUfyTPUGUN7qYmfeXagiJl9xLw8TbNtoRMjDX2rqbNbQlG569v2cdM3YlP+fwsd1t8IzG/euss0HIV2ZEiKcvQJxc6rap+Nqvfl/6mhO5GYgMLPhNjXyTN7TOrMLdTuqsIfv7/1wCCKnfcKA9UPFsFHxcLcmk1H0Q== chieh736@selfhost" # noqa yaml[line-length]
 systemd:
   units:
-    - name: systemd-timesyncd.service
-      mask: true
-    - name: ntpd.service
-      enabled: true
     - name: sshd.socket
       dropins:
         - name: 10-sshd-port.conf
@@ -32,42 +17,26 @@ systemd:
             ListenStream=2222
     - name: docker.service
       enabled: true
-    - name: cpu-governor.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Enable CPU power saving
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        ExecStart=/usr/sbin/modprobe cpufreq_conservative
-        ExecStart=/usr/bin/sh -c '/usr/bin/echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
-
-        [Install]
-        WantedBy=multi-user.target
-
 
 storage:
   files:
-    - path: /etc/ntp.conf
+    - path: /etc/systemd/timesyncd.conf
       overwrite: true
       mode: 0644 # noqa yaml[octal-values]
       contents:
         inline: |
-          server ntp.aliyun.com
-          server ntp.tuna.tsinghua.edu.cn
-
-          # - Allow only time queries, at a limited rate.
-          # - Allow all local queries (IPv4, IPv6)
-          restrict default nomodify nopeer noquery limited kod
-          restrict 127.0.0.1
-          restrict [::1]
+          [Time]
+          NTP=ntp.aliyun.com ntp.tuna.tsinghua.edu.cn
     - path: /etc/ssh/sshd_config
       overwrite: true
       mode: 0600 # noqa yaml[octal-values]
       contents:
         inline: |
+          # Use most defaults for sshd configuration.
+          UsePrivilegeSeparation sandbox
+          Subsystem sftp internal-sftp
+          UseDNS no
+
           PermitRootLogin no
           AllowUsers core
           AuthenticationMethods publickey
@@ -78,7 +47,7 @@ storage:
           Name=eth0
 
           [Network]
-          Address=192.168.123.280/24
+          Address=192.168.123.33/24
           Gateway=192.168.123.1
           DNS=192.168.123.1
     - path: /etc/flatcar/nvidia-metadata
