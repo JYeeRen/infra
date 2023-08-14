@@ -1,0 +1,304 @@
+# cloud-config
+
+# Additional system users
+users:
+  - name: "kairos"
+    passwd: "kairos"
+    lock_passwd: true
+    groups: "admin"
+    ssh_authorized_keys:
+  # - github:mudler
+
+# enable debug logging
+debug: true
+# Additional paths for look for cloud-init files
+cloud-init-paths:
+  - "/some/path"
+# fail on cloud-init errors, defaults to false
+strict: false
+
+# The install block is to drive automatic installations without user interaction.
+install:
+  # Device for automated installs
+  device: "/dev/sda"
+  # Reboot after installation
+  reboot: true
+  # Power off after installation
+  poweroff: true
+  # Set to true when installing without Pairing
+  auto: true
+
+  # firmware to use ('efi|bios')
+  # This is autodetected so only use this to force the installation to use a different one if needed.
+  # NOTE: This can break your system boot if forced to the wrong value
+  firmware: efi
+  # Disk format ('gpt|msdos')
+  # Defaults to gpt. We recommend not changing it to msdos unless it's needed for legacy hardware
+  part-table: gpt
+
+  # Override the grub entry name
+  grub-entry-name: Kairos
+
+  # partitions setup
+  # setting a partition size key to 0 means that the partition will take over the rest of the free space on the disk
+  # after creating the rest of the partitions
+  # by default the persistent partition has a value of 0
+  # if you want any of the extra partitions to fill the rest of the space, you will need to set the persistent partition
+  # size to a different value, for example
+  # partitions:
+  #   persistent:
+  #     size: 300
+
+  # default partitions
+  # only 'oem', 'recovery', 'state' and 'persistent' objects allowed
+  # Only size and fs should be changed here
+  # size in MiB
+  partitions:
+    oem:
+      size: 60
+      fs: ext4
+    recovery:
+      size: 4096
+      fs: ext4
+  # note: This can also be set with dot notation like the following examples for a more condensed view:
+  # partitions.oem.size: 60
+  # partitions.oem.fs: ext4
+  # partitions.recovery.size: 4096
+  # partitions.recovery.fs: ext4
+
+  # extra partitions to create during install
+  # only size, label and fs are used
+  # name is used for the partition label, but it's not really used during the kairos lifecycle. No spaces allowed.
+  # if no fs is given the partition will be created but not formatted
+  # These partitions are not automounted only created and formatted
+  extra-partitions:
+    - Name: myPartition
+      size: 100
+      fs: ext4
+      label: ONE_PARTITION
+    - Name: myOtherPartition
+      size: 200
+      fs: ext4
+      label: TWO_PARTITION
+
+  # no-format: true skips any disk partitioning and formatting
+  # If set to true installation procedure will error out if expected
+  # partitions are not already present within the disk.
+  no-format: false
+
+  # if no-format is used and elemental is running over an existing deployment
+  # force can be used to force installation.
+  force: false
+
+  # Creates these dirs in the rootfs during installation. As the rootfs is RO from boot, sometimes we find that we
+  # some applications want to write to non-standard paths like /data
+  # If that dir is not already in the rootfs it makes it difficult to create that path on an RO system
+  # This allows to create some extra paths in the rootfs that then we count use for mounting or binding via
+  # the cloud-config stages
+  extra-dirs-rootfs:
+    - /data
+    - /src
+
+  # Override image sizes for active/passive/recovery
+  # Note that the active+passive images are stored in the state partition and
+  # the recovery in the recovery partition, so they should be big enough to accommodate te images sizes set below
+  # size in MiB
+  system:
+    size: 4096
+  passive:
+    size: 4096
+  recovery-system:
+    size: 5000
+  # note: This can also be set with dot notation like the following examples for a more condensed view:
+  # system.size: 4096
+  # passive.size: 4096
+  # recovery-system.size: 5000
+
+  # Use a different container image for the installation
+  image: "docker:.."
+  # Add bundles in runtime
+  bundles:
+    - ...
+  # Set grub options
+  grub_options:
+    # additional Kernel option cmdline to apply
+    extra_cmdline: "config_url=http://"
+    # Same, just for active
+    extra_active_cmdline: ""
+    # Same, just for passive
+    extra_passive_cmdline: ""
+    # Change GRUB menu entry
+    default_menu_entry: ""
+  # Environmental variable to set to the installer calls
+  env:
+    - foo=bar
+  # custom user mounts
+  # bind mounts, can be read and modified, changes persist reboots
+  bind_mounts:
+    - /mnt/bind1
+    - /mnt/bind2
+  # ephemeral mounts, can be read and modified, changed are discarded at reboot
+  ephemeral_mounts:
+
+# The reset block configures what happens when reset is called
+reset:
+  # Reboot after reset
+  reboot: true
+  # Power off after reset
+  poweroff: true
+
+  # Override the grub entry name
+  grub-entry-name: Kairos
+
+  # if set to true it will format persistent partitions ('oem 'and 'persistent')
+  reset-persistent: true
+  reset-oem: false
+
+  # Creates these dirs in the rootfs during reset. As the rootfs is RO from boot, sometimes we find that we
+  # some applications want to write to non-standard paths like /data
+  # If that dir is not already in the rootfs it makes it difficult to create that path on an RO system
+  # This allows to create some extra paths in the rootfs that then we count use for mounting or binding via
+  # the cloud-config stages
+  extra-dirs-rootfs:
+    - /data
+    - /src
+
+
+# The upgrade block configures what happens when upgrade is called
+upgrade:
+  # Reboot after upgrade
+  reboot: true
+  # Power off after upgrade
+  poweroff: true
+
+  # Override the grub entry name
+  grub-entry-name: Kairos
+
+  # if set to true upgrade command will upgrade recovery system instead
+  # of main active system
+  recovery: false
+
+  # Override image sizes for active/recovery
+  # Note that the active+passive images are stored in the state partition and
+  # the recovery in the recovery partition, so they should be big enough to accommodate te images sizes set below
+  # size in MiB
+  # During upgrade only the active or recovery image cna be resized as those are the ones that contain the upgrade
+  # passive image is the current system, and that its untouched during the upgrade
+  system:
+    size: 4096
+  recovery-system:
+    size: 5000
+
+  # Creates these dirs in the rootfs during upgrade. As the rootfs is RO from boot, sometimes we find that we
+  # some applications want to write to non-standard paths like /data
+  # If that dir is not already in the rootfs it makes it difficult to create that path on an RO system
+  # This allows to create some extra paths in the rootfs that then we count use for mounting or binding via
+  # the cloud-config stages
+  extra-dirs-rootfs:
+    - /data
+    - /src
+
+
+k3s:
+  # Additional env/args for k3s server instances
+  env:
+    K3S_RESOLV_CONF: ""
+    K3S_DATASTORE_ENDPOINT: "mysql://username:password@tcp(hostname:3306)/database-name"
+  args:
+    - --node-label ""
+    - --data-dir ""
+  # Enabling below it replaces args/env entirely
+  # replace_env: true
+  # replace_args: true
+
+k3s-agent:
+  # Additional env/args for k3s agent instances
+  env:
+    K3S_NODE_NAME: "foo"
+  args:
+    - --private-registry "..."
+  # Enabling below it replaces args/env entirely
+  # replace_env: true
+  # replace_args: true
+
+# The p2p block enables the p2p full-mesh functionalities.
+# To disable, don't specify one.
+p2p:
+  # Manually set node role. Available: master, worker. Defaults auto (none). This is available
+  role: "master"
+  # User defined network-id. Can be used to have multiple clusters in the same network
+  network_id: "dev"
+  # Enable embedded DNS See also: https://mudler.github.io/edgevpn/docs/concepts/overview/dns/
+  dns: true
+  # Disabling DHT makes co-ordination to discover nodes only in the local network
+  disable_dht: true # Enabled by default
+  # Configures a VPN for the cluster nodes
+  vpn:
+    create: false # defaults to true
+    use: false # defaults to true
+    env:
+      # EdgeVPN environment options
+      DHCP: "true"
+      # Disable DHT (for airgap)
+      EDGEVPNDHT: "false"
+      EDGEVPNMAXCONNS: "200"
+      # If DHCP is false, it's required to be given a specific node IP. Can be arbitrary
+      ADDRESS: "10.2.0.30/24"
+      # See all EDGEVPN options:
+      # - https://github.com/mudler/edgevpn/blob/master/cmd/util.go#L33
+      # - https://github.com/mudler/edgevpn/blob/master/cmd/main.go#L48
+  # Automatic cluster deployment configuration
+  auto:
+    # Enables Automatic node configuration (self-coordination)
+    # for role assignment
+    enable: true
+    # HA enables automatic HA roles assignment.
+    # A master cluster init is always required,
+    # Any additional master_node is configured as part of the
+    # HA control plane.
+    # If auto is disabled, HA has no effect.
+    ha:
+      # Enables HA control-plane
+      enable: true
+      # Number of HA additional master nodes.
+      # A master node is always required for creating the cluster and is implied.
+      # The setting below adds 2 additional master nodes, for a total of 3.
+      master_nodes: 2
+      # Use an External database for the HA control plane
+      external_db: "external-db-string"
+  # network_token is the shared secret used by the nodes to co-ordinate with p2p
+  network_token: "YOUR_TOKEN_GOES_HERE"
+
+## Sets the Elastic IP used in KubeVIP. Only valid with p2p
+kubevip:
+  eip: "192.168.1.110"
+  # Specify a manifest URL for KubeVIP. Empty uses default
+  manifest_url: ""
+  # Enables KubeVIP
+  enable: true
+  # Specifies a KubeVIP Interface
+  interface: "ens18"
+
+# Additional cloud init syntax can be used here.
+# See `stages` below.
+stages:
+  network:
+    - name: "Setup users"
+      authorized_keys:
+        kairos:
+          - github:mudler
+
+# Standard cloud-init syntax, see: https://github.com/mudler/yip/tree/e688612df3b6f24dba8102f63a76e48db49606b2#compatibility-with-cloud-init-format
+growpart:
+  devices: ['/']
+
+
+runcmd:
+  - foo
+hostname: "bar"
+write_files:
+  - encoding: b64
+    content: CiMgVGhpcyBmaWxlIGNvbnRyb2xzIHRoZSBzdGF0ZSBvZiBTRUxpbnV4
+    path: /foo/bar
+    permissions: "0644"
+    owner: "bar"

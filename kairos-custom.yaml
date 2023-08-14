@@ -1,0 +1,39 @@
+# cloud-config
+
+# Additional system users
+users:
+  - name: "admin"
+    passwd: "1q21"
+    lock_passwd: true
+    groups: "admin"
+    ssh_authorized_keys:
+      - |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9PURxQWwzj7coP+ex7/K061GL7ta1
+        ++IikhC5oazBzQPXH5oFha0g+rIqP3lVSC2Ajxq+zTCkfB8zy7PxmIYR7fruRNt7RiU8
+        fuGjcArURhRxC4wOslB9kcYDgIp3QvbuJBZNh6ekXwvxFEkgHqZ5omD2c10dPWxNY908
+        H0k+ENXpuWOQ46ZU+t16mz1G65VY+uvzN67b6LOjRUe+b19wNFAXPgvlqnVxzXHxerqK
+        Bq8Ok4JCGYNetUucfPeRh9DC/WrzYFfIbMBuoGz0VyZ7dBAYbzeNDvUUozcAn4WXjtyA
+        +S83ClLtH3C5E2WspnP74dpDH80+Ls7yXQAkukdFwWpIzUNiZEZhyeAZPY18kKMtmpbD
+        M0sjrBS/OMJXu8UEODD+KZx7oVTRwOVVXqb5hfytnLTts/cO/Ic5xPfKpRtspJqg8hR1
+        Sisv792sWUDOebuWbMt4R0gtTfJaE84IEI1vYANbQtMHWB/nZkE9nQIOMXuiBQnyo/zG
+        snIE7DvlQXPqfNiR7WUfyTPUGUN7qYmfeXagiJl9xLw8TbNtoRMjDX2rqbNbQlG569v2
+        cdM3YlP+fwsd1t8IzG/euss0HIV2ZEiKcvQJxc6rap+Nqvfl/6mhO5GYgMLPhNjXyTN7
+        TOrMLdTuqsIfv7/1wCCKnfcKA9UPFsFHxcLcmk1H0Q== chieh736@selfhost
+
+# enable debug logging
+debug: false
+
+k3s:
+  enabled: true
+
+stages:
+  initramfs:
+    - files:
+        - path: /var/lib/connman/default.config
+          permissions: "0644"
+          content: |
+            [service_eth0]
+            Type = ethernet
+            IPv4 = 192.168.123.170/255.255.255.0/192.168.123.1
+            IPv6 = off
+            Nameservers = 192.168.123.1

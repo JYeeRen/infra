@@ -1,0 +1,88 @@
+variant: flatcar
+version: 1.0.0
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9PURxQWwzj7coP+ex7/K061GL7ta1
+          ++IikhC5oazBzQPXH5oFha0g+rIqP3lVSC2Ajxq+zTCkfB8zy7PxmIYR7fruRNt7RiU8
+          fuGjcArURhRxC4wOslB9kcYDgIp3QvbuJBZNh6ekXwvxFEkgHqZ5omD2c10dPWxNY908
+          H0k+ENXpuWOQ46ZU+t16mz1G65VY+uvzN67b6LOjRUe+b19wNFAXPgvlqnVxzXHxerqK
+          Bq8Ok4JCGYNetUucfPeRh9DC/WrzYFfIbMBuoGz0VyZ7dBAYbzeNDvUUozcAn4WXjtyA
+          +S83ClLtH3C5E2WspnP74dpDH80+Ls7yXQAkukdFwWpIzUNiZEZhyeAZPY18kKMtmpbD
+          M0sjrBS/OMJXu8UEODD+KZx7oVTRwOVVXqb5hfytnLTts/cO/Ic5xPfKpRtspJqg8hR1
+          Sisv792sWUDOebuWbMt4R0gtTfJaE84IEI1vYANbQtMHWB/nZkE9nQIOMXuiBQnyo/zG
+          snIE7DvlQXPqfNiR7WUfyTPUGUN7qYmfeXagiJl9xLw8TbNtoRMjDX2rqbNbQlG569v2
+          cdM3YlP+fwsd1t8IzG/euss0HIV2ZEiKcvQJxc6rap+Nqvfl/6mhO5GYgMLPhNjXyTN7
+          TOrMLdTuqsIfv7/1wCCKnfcKA9UPFsFHxcLcmk1H0Q== chieh736@selfhost
+
+systemd:
+  units:
+    - name: systemd-timesyncd.service
+      mask: true
+    - name: ntpd.service
+      enabled: true
+    - name: sshd.socket
+      dropins:
+        - name: 10-sshd-port.conf
+          contents: |
+            [Socket]
+            ListenStream=
+            ListenStream=2222
+    - name: docker.service
+      enabled: true
+    - name: cpu-governor.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable CPU power saving
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/sbin/modprobe cpufreq_conservative
+        ExecStart=/usr/bin/sh -c '/usr/bin/echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+
+        [Install]
+        WantedBy=multi-user.target
+
+
+storage:
+  files:
+    - path: /etc/ntp.conf
+      overwrite: true
+      mode: 0644 # noqa yaml[octal-values]
+      contents:
+        inline: |
+          server ntp.aliyun.com
+          server ntp.tuna.tsinghua.edu.cn
+
+          # - Allow only time queries, at a limited rate.
+          # - Allow all local queries (IPv4, IPv6)
+          restrict default nomodify nopeer noquery limited kod
+          restrict 127.0.0.1
+          restrict [::1]
+    - path: /etc/ssh/sshd_config
+      overwrite: true
+      mode: 0600 # noqa yaml[octal-values]
+      contents:
+        inline: |
+          PermitRootLogin no
+          AllowUsers core
+          AuthenticationMethods publickey
+    - path: /etc/systemd/network/00-eth0.network
+      contents:
+        inline: |
+          [Match]
+          Name=eth0
+
+          [Network]
+          Address=192.168.123.280/24
+          Gateway=192.168.123.1
+          DNS=192.168.123.1
+    - path: /etc/flatcar/nvidia-metadata
+      mode: 0644 # noqa yaml[octal-values]
+      contents:
+        inline: |
+          NVIDIA_DRIVER_VERSION=535.54.06
