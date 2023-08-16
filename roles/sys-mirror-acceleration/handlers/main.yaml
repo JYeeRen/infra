@@ -1,0 +1,6 @@
+---
+
+- name: Restart pvedaemon
+  ansible.builtin.service:
+    name: pvedaemon
+    state: restarted

@@ -1,0 +1,38 @@
+---
+
+- name: Ensure /mnt points exists
+  ansible.builtin.file:
+    dest: "{{ item.path }}"
+    state: directory
+    owner: nobody
+    group: nogroup
+    mode: "0777"
+  with_items:
+    - "{{ extra_mountpoints }}"
+    - "{{ snapraid_parity_disks }}"
+    - "{{ snapraid_data_disks }}"
+
+- name: Ensure disks mounted
+  ansible.posix.mount:
+    name: "{{ item.path }}"
+    src: "{{ item.diskbyid }}"
+    fstype: "{{ item.fs }}"
+    opts: "{{ item.opts }}"
+    state: "{{ item.state | default('present') }}"
+  with_items:
+    - "{{ extra_mountpoints }}"
+    - "{{ snapraid_parity_disks }}"
+    - "{{ snapraid_data_disks }}"
+  notify:
+    - Reload daemon
+  when: item.diskbyid is defined and item.fs is defined
+
+- name: Ensure mergerfs mounted
+  ansible.posix.mount:
+    name: "{{ item.mountpoint }}"
+    src: "{{ item.source }}"
+    opts: "{{ item.opts }}"
+    fstype: "{{ item.fs }}"
+    state: present
+  with_items:
+    - "{{ fstab_mergerfs }}"

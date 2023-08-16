@@ -1,5 +1,5 @@
 pve:
-	ansible-playbook -b main.yaml --limit pve
+	ansible-playbook -b main.yaml --skip-tags vgpu --limit pve
 
 reqs:
 	ansible-galaxy install -r requirements.yaml

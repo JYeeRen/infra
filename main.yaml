@@ -8,4 +8,6 @@
   roles:
     - role: sys-mirror-acceleration
     - role: pve-remove-nag
-    - role: vgpu
+    - role: pve-vgpu
+      tags: ["vgpu"]
+    - role: sys-disks

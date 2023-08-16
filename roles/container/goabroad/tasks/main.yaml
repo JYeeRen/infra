@@ -1,0 +1,17 @@
+---
+
+- name: Ensure clashx container exists.
+  community.docker.docker_container:
+    name: clash
+    image: dreamacro/clash-premium
+    ports:
+      - 9090:9090
+      - 7890:7890
+    env:
+      PUID: '1000'
+      PGID: '1000'
+      TZ: Asia/Shanghai
+    volumes:
+      - ""
+    restart_policy: unless-stopped
+    state: started

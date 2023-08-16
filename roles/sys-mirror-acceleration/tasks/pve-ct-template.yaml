@@ -4,5 +4,7 @@
   ansible.builtin.replace:
     path: /usr/share/perl5/PVE/APLInfo.pm
     regexp: http://download.proxmox.com
-    replace: "{{ mirror }}/proxmox"
+    replace: "{{ ct_mirror }}"
     backup: true
+  notify:
+    - Restart pvedaemon

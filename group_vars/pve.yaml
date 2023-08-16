@@ -1,0 +1,28 @@
+---
+
+main_storage_path: /mnt/storage
+extra_mountpoints:
+  - { path: "{{ main_storage_path }}" }
+  - { path: /mnt/aliyundrive }
+  # - { path: /opt, diskbyid: "UUID=cbf30089-2d57-4e83-ad62-763992d0f57a", fs: ext4, opts: "defaults,discard" }
+
+# ironicbadger.snapraid
+snapraid_parity_disks:
+  - { path: /mnt/parity1, diskbyid: /dev/disk/by-id/ata-HGST_HTS541010A9E680_170215JA104NZ406UM2V-part1, fs: ext4, opts: defaults, content: false }
+
+snapraid_data_disks:
+  - { path: /mnt/disk1, diskbyid: /dev/disk/by-id/ata-ST1000DM010-2EP102_Z9ADWTT5-part1, fs: ext4, opts: defaults, content: true, state: mounted }
+  - { path: /mnt/disk2, diskbyid: /dev/disk/by-id/ata-ST1000LM024_HN-M101MBB_S2SMJ9CD402134-part1, fs: ext4, opts: defaults, content: true, state: mounted }
+  - { path: /mnt/disk3, diskbyid: /dev/disk/by-id/ata-WUH721414ALE6L0_X1G0ZRWL-part1, fs: ext4, opts: defaults, content: true, state: mounted }
+
+
+fstab_mergerfs: []
+# fstab_mergerfs:
+#   - source: /mnt/disk*:/mnt/tank/fuse
+#     mountpoint: /mnt/storage
+#     fs: fuse.mergerfs
+#     opts: defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=epmfs,dropcacheonclose=true,minfreespace=250G,fsname=mergerfs
+#   - source: /mnt/disk*
+#     mountpoint: /mnt/jbod
+#     fs: fuse.mergerfs
+#     opts: defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=mspmfs,dropcacheonclose=true,minfreespace=100G,fsname=jbod
