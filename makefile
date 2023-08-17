@@ -1,6 +1,9 @@
 pve:
 	ansible-playbook -b main.yaml --skip-tags vgpu --limit pve
 
+penguin:
+	ansible-playbook -b main.yaml --limit penguin-logistics
+
 reqs:
 	ansible-galaxy install -r requirements.yaml
 

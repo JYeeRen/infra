@@ -1,6 +1,6 @@
 ---
 
-- name: Setup pve
+- name: Setup pve.
   hosts: pve
   vars:
     pve: true
@@ -8,6 +8,14 @@
   roles:
     - role: sys-mirror-acceleration
     - role: pve-remove-nag
+    - role: geerlingguy.security
+      tags: ["security"]
     - role: pve-vgpu
       tags: ["vgpu"]
-    - role: sys-disks
+
+- name: Setup penguin-logistics.
+  hosts: penguin-logistics
+  roles:
+    - role: fs-mergerfs
+      tags: ["mergerfs"]
+    - role: fs-mount

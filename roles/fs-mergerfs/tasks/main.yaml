@@ -1,0 +1,7 @@
+---
+
+- name: Enusre dependent packages installed.
+  ansible.builtin.package:
+    name: mergerfs
+    state: present
+    update_cache: true

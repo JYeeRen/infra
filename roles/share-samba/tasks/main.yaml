@@ -1,0 +1,7 @@
+---
+
+- name: Ensure share user exists.
+  ansible.builtin.user:
+    name: share
+    uid: 1040
+    shell: /usr/sbin/nologin
