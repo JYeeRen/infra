@@ -12,27 +12,28 @@ samba_user: share
 #
 disks:
   - path: /mnt/disk1
-    diskbyid: /dev/disk/by-id/ata-ST1000DM010-2EP102_Z9ADWTT5-part1
+    diskbyid: /dev/disk/by-id/ata-ST1000DM010-2EP102_Z9ADWTT5-part1 # 1T
     diskbyuuid: /dev/disk/by-uuid/dd60bbf1-b826-4f20-9d32-4ca85d498b07
     fs: ext4
     opts: defaults
     content: true
   - path: /mnt/disk2
-    diskbyid: /dev/disk/by-id/ata-ST1000LM024_HN-M101MBB_S2SMJ9CD402134-part1
+    diskbyid: /dev/disk/by-id/ata-ST1000LM024_HN-M101MBB_S2SMJ9CD402134-part1 # 1T
     diskbyuuid: /dev/disk/by-uuid/e6fed790-956a-4b54-ae35-8a37e4808a06
     fs: ext4
     opts: defaults
     content: true
   - path: /mnt/disk3
-    diskbyid: /dev/disk/by-id/ata-WUH721414ALE6L0_X1G0ZRWL-part1
+    diskbyid: /dev/disk/by-id/ata-WUH721414ALE6L0_X1G0ZRWL-part1 # 14T
     diskbyuuid: /dev/disk/by-uuid/3b4eb2c8-0648-4d2a-b9e7-f4d5e2a0262b
     fs: ext4
     opts: defaults
     content: true
+    state: absent
 
 parity_disks:
   - path: /mnt/parity1
-    diskbyid: /dev/disk/by-id/ata-HGST_HTS541010A9E680_170215JA104NZ406UM2V-part1
+    diskbyid: /dev/disk/by-id/ata-HGST_HTS541010A9E680_170215JA104NZ406UM2V-part1 # 1T
     diskbyuuid: /dev/disk/by-uuid/fe145c2a-6b38-4370-a98b-e78cace78daf
     fs: ext4
     opts: defaults
@@ -72,10 +73,10 @@ samba_mitigate_cve_2017_7494: false
 samba_server_max_protocol: 'SMB3'
 samba_server_min_protocol: 'SMB1'
 samba_shares:
-    - { name: storage, comment: Storage on ark, path: /mnt/storage }
-    - { name: mediadata, comment: Storage on ark, path: /mnt/storage/mediadata }
-    - { name: photos, comment: Photos on ZFS mirror, path: /mnt/tank/fuse/photos }
-    # - { name: downloads, comment: Downloads, path: /mnt/tank/fuse/photos }
-    - { name: z_disk1, comment: disk1, path: /mnt/disk1 }
-    - { name: z_disk2, comment: disk2, path: /mnt/disk2 }
-    - { name: z_parity1, comment: parity1, path: /mnt/parity1 }
+  - { name: storage, comment: Storage on ark, path: /mnt/storage }
+  - { name: mediadata, comment: Storage on ark, path: /mnt/storage/mediadata }
+  - { name: photos, comment: Photos on ZFS mirror, path: /mnt/tank/fuse/photos }
+  # - { name: downloads, comment: Downloads, path: /mnt/tank/fuse/photos }
+  - { name: z_disk1, comment: disk1, path: /mnt/disk1 }
+  - { name: z_disk2, comment: disk2, path: /mnt/disk2 }
+  - { name: z_parity1, comment: parity1, path: /mnt/parity1 }

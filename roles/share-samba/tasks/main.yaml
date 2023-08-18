@@ -1,7 +1,61 @@
 ---
 
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yaml"
+
 - name: Ensure share user exists.
   ansible.builtin.user:
     name: share
     uid: 1040
     shell: /usr/sbin/nologin
+
+- name: Ensure Samba-related packages are installed (Debian).
+  ansible.builtin.apt:
+    name: "{{ item.name | default(item) }}"
+    state: present
+  with_items: "{{ samba_packages }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Install Samba VFS extensions packages.
+  ansible.builtin.package:
+    name: "{{ samba_vfs_packages }}"
+    state: present
+  when: samba_vfs_packages is defined
+
+- name: Ensure Samba is running and set to start on boot.
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items: "{{ samba_services }}"
+
+- name: Ensure smb.conf exists.
+  ansible.builtin.copy:
+    src: smb.conf
+    dest: /etc/samba/smb.conf
+    mode: "0644"
+    owner: root
+    group: root
+  notify:
+    - Restart samba services
+
+- name: Ensure shares in smb.conf
+  ansible.builtin.blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [{{ item.name }}]
+        comment = {{ item.comment }}
+        path = {{ item.path }}
+        browseable = yes
+        read only = no
+        writable = yes
+        write list = share
+        public = no
+        guest ok = no
+        create mask = 0775
+        directory mask = 0775
+    marker: "# {mark} {{ item.name }} ANSIBLE MANAGED BLOCK"
+  with_items:
+    - { name: test, comment: test, path: /mnt/test }
+  notify:
+    - Restart samba services

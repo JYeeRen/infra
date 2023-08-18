@@ -1,0 +1,14 @@
+---
+
+samba_packages:
+  - samba
+  - samba-client
+  - samba-common
+  - cifs-utils
+
+samba_vfs_packages:
+  - samba-vfs-modules
+
+samba_services:
+  - smbd
+  - rsyslog

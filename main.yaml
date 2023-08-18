@@ -19,3 +19,5 @@
     - role: fs-mergerfs
       tags: ["mergerfs"]
     - role: fs-mount
+    - role: share-samba
+      tags: ["samba"]
