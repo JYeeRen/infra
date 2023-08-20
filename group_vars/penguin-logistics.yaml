@@ -80,3 +80,9 @@ samba_shares:
   - { name: z_disk1, comment: disk1, path: /mnt/disk1 }
   - { name: z_disk2, comment: disk2, path: /mnt/disk2 }
   - { name: z_parity1, comment: parity1, path: /mnt/parity1 }
+
+# 
+# NFS (geerlingguy.nfs)
+#
+nfs_exports:
+  - "/mnt/storage/mediadata    *(rw,sync,no_root_squash,fsid=25)"
