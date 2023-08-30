@@ -1,14 +1,23 @@
 ---
 
-- name: Ensure mountpoints exists.
+- name: Ensure extra mountpoints exists.
   ansible.builtin.file:
-    dest: "{{ item.path }}"
-    state: directory
+    path: "{{ item.path }}"
+    state: "{{ item.state | default('directory') }}"
     owner: nobody
     group: nogroup
     mode: "0775"
   with_items:
     - "{{ extra_mountpoints }}"
+
+- name: Ensure disks mountpoints exists.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: "{{ 'directory' if item.state | default('mounted') == 'mounted' else 'absent' }}"
+    owner: nobody
+    group: nogroup
+    mode: "0775"
+  with_items:
     - "{{ disks }}"
     - "{{ parity_disks }}"
 
@@ -31,6 +40,6 @@
     src: "{{ item.source }}"
     opts: "{{ item.opts }}"
     fstype: "{{ item.fs }}"
-    state: mounted
+    state: "{{ item.state | default('mounted') }}"
   with_items:
-    - "{{ fstab_mergerfs }}"
+    - "{{ mergerfs_mountpoints }}"

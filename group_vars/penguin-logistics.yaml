@@ -11,49 +11,46 @@ samba_user: share
 # filesystem-mergerfs
 #
 disks:
-  - path: /mnt/disk1
+  - diskbyuuid: /dev/disk/by-uuid/dd60bbf1-b826-4f20-9d32-4ca85d498b07
     diskbyid: /dev/disk/by-id/ata-ST1000DM010-2EP102_Z9ADWTT5-part1 # 1T
-    diskbyuuid: /dev/disk/by-uuid/dd60bbf1-b826-4f20-9d32-4ca85d498b07
+    path: /mnt/disk1
     fs: ext4
     opts: defaults
-    content: true
-  - path: /mnt/disk2
+  - diskbyuuid: /dev/disk/by-uuid/e6fed790-956a-4b54-ae35-8a37e4808a06
     diskbyid: /dev/disk/by-id/ata-ST1000LM024_HN-M101MBB_S2SMJ9CD402134-part1 # 1T
-    diskbyuuid: /dev/disk/by-uuid/e6fed790-956a-4b54-ae35-8a37e4808a06
+    path: /mnt/disk2
     fs: ext4
     opts: defaults
-    content: true
-  - path: /mnt/disk3
-    diskbyid: /dev/disk/by-id/ata-WUH721414ALE6L0_X1G0ZRWL-part1 # 14T
-    diskbyuuid: /dev/disk/by-uuid/3b4eb2c8-0648-4d2a-b9e7-f4d5e2a0262b
+  - diskbyuuid: /dev/disk/by-uuid/3b4eb2c8-0648-4d2a-b9e7-f4d5e2a0262b
+    diskbyid: /dev/disk/by-id/ata-WUH721414ALE6L0_X1G0ZRWL-part1 # 12T
+    path: /mnt/disk3
     fs: ext4
     opts: defaults
-    content: true
-    state: absent
 
 parity_disks:
-  - path: /mnt/parity1
+  - diskbyuuid: /dev/disk/by-uuid/fe145c2a-6b38-4370-a98b-e78cace78daf
     diskbyid: /dev/disk/by-id/ata-HGST_HTS541010A9E680_170215JA104NZ406UM2V-part1 # 1T
-    diskbyuuid: /dev/disk/by-uuid/fe145c2a-6b38-4370-a98b-e78cace78daf
+    path: /mnt/parity1
     fs: ext4
     opts: defaults
-    content: false
 
 main_storage_path: /mnt/storage
 
 extra_mountpoints:
   - { path: "{{ main_storage_path }}" }
-  - { path: /mnt/aliyundrive }
+  - { path: /mnt/aliyundrive, state: absent }
 
-fstab_mergerfs:
-  - source: /mnt/disk*:/mnt/tank/fuse
+mergerfs_mountpoints:
+  - source: /mnt/disk*
     mountpoint: /mnt/storage
     fs: fuse.mergerfs
-    opts: defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=epmfs,dropcacheonclose=true,minfreespace=250G,fsname=mergerfs
+    opts: defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=epmfs,dropcacheonclose=true,minfreespace=100G,fsname=mergerfs
+    state: absent
   - source: /mnt/disk*
     mountpoint: /mnt/jbod
     fs: fuse.mergerfs
     opts: defaults,nonempty,allow_other,use_ino,moveonenospc=true,category.create=mspmfs,dropcacheonclose=true,minfreespace=100G,fsname=jbod
+    state: absent
 
 # # ironicbadger.snapraid
 # snapraid_data_disks: '{{ disks }}'
@@ -81,7 +78,7 @@ samba_shares:
   - { name: z_disk2, comment: disk2, path: /mnt/disk2 }
   - { name: z_parity1, comment: parity1, path: /mnt/parity1 }
 
-# 
+#
 # NFS (geerlingguy.nfs)
 #
 nfs_exports:
