@@ -5,3 +5,14 @@
     name: mergerfs
     state: present
     update_cache: true
+
+- name: Ensure mergerfs mounted.
+  ansible.posix.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    opts: "{{ item.opts }}"
+    fstype: "{{ item.fs }}"
+    state: "{{ item.state | default('mounted') }}"
+  with_items:
+    - "{{ mergerfs_mountpoints }}"
+  when: mergerfs_mountpoints is defined and mergerfs_mountpoints | length > 0

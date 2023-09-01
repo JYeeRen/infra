@@ -1,5 +1,13 @@
 ---
 
+#
+# grog.package
+#
+package_list:
+  - name: pv
+  - name: curl
+  - name: wget
+  - name: rsync
 
 # SSH - geerlingguy.security
 security_ssh_password_authentication: "yes"
@@ -10,3 +18,9 @@ security_autoupdate_reboot: false
 security_autoupdate_reboot_time: "03:00"
 security_autoupdate_mail_to: ""
 security_autoupdate_mail_on_error: false
+
+#
+# fs-mount
+#
+extra_mountpoints:
+  - { src: 192.168.123.44:/mnt/storage, path: /penguin, fs: nfs, opts: "rw,sync,hard,intr", state: mounted, boot: true }

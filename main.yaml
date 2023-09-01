@@ -6,20 +6,23 @@
     pve: true
     use_official_security: false
   roles:
-    - role: sys-mirror-acceleration
-    - role: pve-remove-nag
-    - role: geerlingguy.security
-      tags: ['security']
-    - role: pve-vgpu
-      tags: ['vgpu']
+    # - role: grog.package
+    # - role: sys-mirror-acceleration
+    # - role: pve-remove-nag
+    # - role: geerlingguy.security
+    #   tags: ['security']
+    # - role: pve-vgpu
+    #   tags: ['vgpu']
+    - role: fs-mount
+      tags: ['fs', 'mount']
 
 - name: Setup penguin-logistics.
   hosts: penguin-logistics
   roles:
+    - role: fs-mount
     - role: fs-mergerfs
       tags: ['mergerfs']
-    - role: fs-mount
     # - role: share-samba
     #   tags: ['samba']
-    # - role: geerlingguy.nfs
-    #   tags: ['nfs']
+    - role: geerlingguy.nfs
+      tags: ['nfs']

@@ -1,15 +1,15 @@
 collections:
-  - prometheus.prometheus
+  # - prometheus.prometheus
   - community.docker
 
 roles:
-  - name: geerlingguy.security
-  - name: geerlingguy.docker
+  # - name: geerlingguy.security
+  # - name: geerlingguy.docker
   - name: grog.package
-  - name: ironicbadger.docker_compose_generator
+  # - name: ironicbadger.docker_compose_generator
   - name: geerlingguy.nfs
-  - name: ironicbadger.bash_aliases
-  - name: geerlingguy.repo-epel
-  - name: geerlingguy.docker
-  - name: geerlingguy.ntp
-  - name: chriswayg.msmtp-mailer
+  # - name: ironicbadger.bash_aliases
+  # - name: geerlingguy.repo-epel
+  # - name: geerlingguy.docker
+  # - name: geerlingguy.ntp
+  # - name: chriswayg.msmtp-mailer

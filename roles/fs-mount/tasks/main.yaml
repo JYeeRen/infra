@@ -1,45 +1,26 @@
 ---
 
-- name: Ensure extra mountpoints exists.
+- name: Ensure mountpoints exists.
   ansible.builtin.file:
     path: "{{ item.path }}"
-    state: "{{ item.state | default('directory') }}"
+    state: "{{ 'absent' if item.state | default('mounted') == 'absent' else 'directory' }}"
     owner: nobody
     group: nogroup
     mode: "0775"
   with_items:
-    - "{{ extra_mountpoints }}"
+    - "{{ extra_mountpoints | default([]) }}"
+    - "{{ disks | default([]) }}"
+    - "{{ parity_disks | default([]) }}"
 
-- name: Ensure disks mountpoints exists.
-  ansible.builtin.file:
+- name: Ensure points mounted.
+  ansible.posix.mount:
+    src: "{{ item.src }}"
     path: "{{ item.path }}"
-    state: "{{ 'directory' if item.state | default('mounted') == 'mounted' else 'absent' }}"
-    owner: nobody
-    group: nogroup
-    mode: "0775"
-  with_items:
-    - "{{ disks }}"
-    - "{{ parity_disks }}"
-
-- name: Ensure disks mounted.
-  ansible.posix.mount:
-    name: "{{ item.path }}"
-    src: "{{ item.diskbyuuid }}"
     fstype: "{{ item.fs }}"
     opts: "{{ item.opts }}"
     state: "{{ item.state | default('mounted') }}"
+  when: item.src is defined and item.fs is defined
   with_items:
-    - "{{ extra_mountpoints }}"
-    - "{{ disks }}"
-    - "{{ parity_disks }}"
-  when: item.diskbyuuid is defined and item.fs is defined
-
-- name: Ensure mergerfs mounted.
-  ansible.posix.mount:
-    name: "{{ item.mountpoint }}"
-    src: "{{ item.source }}"
-    opts: "{{ item.opts }}"
-    fstype: "{{ item.fs }}"
-    state: "{{ item.state | default('mounted') }}"
-  with_items:
-    - "{{ mergerfs_mountpoints }}"
+    - "{{ extra_mountpoints | default([]) }}"
+    - "{{ disks | default([]) }}"
+    - "{{ parity_disks | default([]) }}"
