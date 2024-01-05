@@ -35,4 +35,26 @@
     docker_daemon_options:
       registry-mirrors: ["https://docker.mirrors.ustc.edu.cn/"]
   roles:
-    # - role: geerlingguy.docker
+    - role: geerlingguy.docker
+
+- name: Setup aliyun
+  hosts: aliyun
+  vars:
+    appdata_path: /root
+    app_network: apps
+  vars_files:
+    - ./vars/vault.yaml
+  roles:
+    - role: docker-accelerator
+    - role: docker-smokeping
+
+- name: Setup azure
+  hosts: azure
+  vars:
+    appdata_path: /home/chieh
+    app_network: apps
+  vars_files:
+    - ./vars/vault.yaml
+  roles:
+    - role: docker-npm
+    - role: docker-registry

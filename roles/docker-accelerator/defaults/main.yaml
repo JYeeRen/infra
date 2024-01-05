@@ -1,0 +1,3 @@
+---
+
+registry_mirrors: '["{{ aliyun_registry_mirror }}"]'

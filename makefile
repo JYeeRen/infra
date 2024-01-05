@@ -1,3 +1,6 @@
+azure:
+	ansible-playbook -b main.yaml --limit azure
+
 pve:
 	ansible-playbook -b main.yaml --skip-tags vgpu --limit pve
 

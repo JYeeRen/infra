@@ -1,0 +1,9 @@
+---
+
+- name: Ensure compose yml file exists.
+  ansible.builtin.copy:
+    src: etc/systemd/system/docker.service.d/zfs-override.conf
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    owner: root
+    group: root
+    mode: '0644'

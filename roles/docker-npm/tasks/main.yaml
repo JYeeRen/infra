@@ -1,0 +1,17 @@
+---
+
+- name: Start nginx proxy manager
+  community.docker.docker_container:
+    name: npm
+    state: started
+    restart_policy: unless-stopped
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - 80:80
+      - 81:81
+      - 443:443
+    volumes:
+      - "{{ appdata_path }}/npm/data:/data"
+      - "{{ appdata_path }}/npm/letsencrypt:/etc/letsencrypt"
+    networks:
+      - name: "{{ app_network }}"

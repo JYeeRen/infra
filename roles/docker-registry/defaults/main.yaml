@@ -1,0 +1,4 @@
+---
+
+proxy_registries:
+  - { name: lscr, url: https://lscr.io }

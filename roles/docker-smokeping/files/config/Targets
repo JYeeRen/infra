@@ -1,0 +1,83 @@
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to the SmokePing website of WORKS Company. \
+         Here you will learn all about the latency of our network.
+
++ InternetSites
+
+menu = Internet Sites
+title = Internet Sites
+
+++ CT-BJ
+menu = 北京电信
+title = 北京电信
+host = 202.96.199.133
+
+++ CT-TJ
+ 
+menu = 天津电信
+title = 天津电信
+host = 219.150.32.132
+
+++ Facebook
+menu = Facebook
+title = Facebook
+host = facebook.com
+
+++ Youtube
+menu = YouTube
+title = YouTube
+host = youtube.com
+
++ ECS
+probe = SSH
+menu = ECS
+title = ECS
+
+++ aliyun
+menu = aliyun
+title = aliyun
+host = 
+
+++ azure
+menu = azure
+title = azure
+host = 
+
+++ tencent
+menu = tencent
+title = tencent
+host = 
+
++ DNS
+menu = DNS
+title = DNS
+
+++ AliDNS1
+menu = Ali DNS 1
+title = Ali DNS 223.5.5.5
+host = 223.5.5.5
+
+++ AliDNS2
+menu = Ali DNS 2
+title = Ali DNS 223.6.6.6
+host = 223.6.6.6
+
++ DNSProbes
+menu = DNS Probes
+title = DNS Probes
+probe = DNS
+
+++ AliDNS1
+menu = Ali DNS 1
+title = Ali DNS 223.5.5.5
+host = 223.5.5.5
+
+++ AliDNS2
+menu = Ali DNS 2
+title = Ali DNS 223.6.6.6
+host = 223.6.6.6

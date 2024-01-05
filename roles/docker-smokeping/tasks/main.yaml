@@ -1,0 +1,28 @@
+---
+
+- name: Copy Smokeping conf.
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ appdata_path }}/smokeping/{{ item }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    backup: true
+  with_items:
+    - config/Targets
+    - config/Probes
+    - resolve.conf
+
+- name: Start smokeping
+  community.docker.docker_container:
+    name: smokeping
+    image: lscr.r00m.online/linuxserver/smokeping
+    restart_policy: unless-stopped
+    env:
+      TZ: Asia/Shanghai
+    volumes:
+      - "{{ appdata_path }}/smokeping/config:/config"
+      - "{{ appdata_path }}/smokeping/resolve.conf:/etc/resolv.conf"
+      - "{{ appdata_path }}/smokeping/data:/data"
+    ports:
+      - 5000:80

@@ -4,8 +4,7 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: Restart samba services
+- name: Restart docker
   ansible.builtin.service:
-    name: "{{ item }}"
+    name: docker
     state: restarted
-  with_items: "{{ samba_services }}"

@@ -1,0 +1,39 @@
+---
+
+- name: Ensure app dir exists.
+  ansible.builtin.file:
+    path: "{{ appdata_path }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items:
+    - registry
+    - registry/lscr
+
+- name: Ensure htpasswd exists.
+  ansible.builtin.template:
+    src: templates/htpasswd.j2
+    dest: "{{ appdata_path }}/registry/htpasswd"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: Ensure lscr config exists.
+  vars:
+    remoteurl: "{{ item.url }}"
+  ansible.builtin.template:
+    src: templates/config.yml.j2
+    dest: "{{ appdata_path }}/registry/{{ item.name }}.yml"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  with_items: "{{ proxy_registries | default([]) }}"
+
+- name: Ensure compose yml exists.
+  ansible.builtin.template:
+    src: templates/docker-compose.registry.yml.j2
+    dest: "{{ appdata_path }}/registry/docker-compose.yml"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
